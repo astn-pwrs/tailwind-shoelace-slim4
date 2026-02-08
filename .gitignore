@@ -1,0 +1,12 @@
+vendor
+node_modules
+!public/index.php
+public/assets
+public/css
+public/fonts
+public/js
+public/pages
+public/shoelace
+#
+package-lock.json
+composer.lock

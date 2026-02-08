@@ -1,0 +1,55 @@
+@layer utilities {
+  /* =========================
+     Layout / Structure
+     ========================= */
+  .page-center {
+    @apply min-h-screen flex items-center justify-center;
+  }
+
+  .card {
+    @apply w-full
+      max-w-xl
+      p-[var(--space-xl)]
+      rounded-[var(--radius-lg)]
+      shadow-[var(--shadow-lg)]
+      bg-[var(--sl-panel-background-color)];
+  }
+
+  .form-actions {
+    @apply flex
+      justify-end
+      gap-[var(--space-sm)]
+      pt-[var(--space-sm)];
+  }
+
+  /* =========================
+     Semantic Colors (重要)
+     ========================= */
+  .bg-primary {
+    background-color: var(--color-primary);
+  }
+  .text-primary-contrast {
+    color: var(--color-primary-contrast);
+  }
+
+  .bg-success {
+    background-color: var(--color-success);
+  }
+  .text-success-contrast {
+    color: var(--color-success-contrast);
+  }
+
+  .bg-warning {
+    background-color: var(--color-warning);
+  }
+  .text-warning-contrast {
+    color: var(--color-warning-contrast);
+  }
+
+  .bg-danger {
+    background-color: var(--color-danger);
+  }
+  .text-danger-contrast {
+    color: var(--color-danger-contrast);
+  }
+}

@@ -1,0 +1,120 @@
+/* =========================================
+   Design Tokens (Source of Truth)
+   Tailwind v4 + Shoelace 完全同期
+   ========================================= */
+
+:root,
+.sl-theme-light,
+.sl-theme-dark {
+  --text-base: light-dark(oklch(0.18 0 0), oklch(0.95 0 0));
+  /* =============================
+     Primary (Sky)
+     ============================= */
+  --color-primary-50: light-dark(#f0f9ff, #082f49);
+  --color-primary-100: light-dark(#e0f2fe, #0c4a6e);
+  --color-primary-200: light-dark(#bae6fd, #075985);
+  --color-primary-300: light-dark(#7dd3fc, #0369a1);
+  --color-primary-400: light-dark(#38bdf8, #0284c7);
+  --color-primary-500: light-dark(#0ea5e9, #38bdf8);
+  --color-primary-600: light-dark(#0284c7, #0c4a6e);
+  --color-primary-700: light-dark(#0369a1, #075985);
+  --color-primary-800: light-dark(#075985, #0369a1);
+  --color-primary-900: light-dark(#0c4a6e, #f0f9ff);
+  --color-primary-contrast: light-dark(black, white);
+
+  /* =============================
+     Success (Green)
+     ============================= */
+  --color-success-50: light-dark(#f0fdf4, #052e16);
+  --color-success-100: light-dark(#dcfce7, #14532d);
+  --color-success-200: light-dark(#bbf7d0, #166534);
+  --color-success-300: light-dark(#86efac, #15803d);
+  --color-success-400: light-dark(#4ade80, #16a34a);
+  --color-success-500: light-dark(#22c55e, #4ade80);
+  --color-success-600: light-dark(#16a34a, #14532d);
+  --color-success-700: light-dark(#15803d, #166534);
+  --color-success-800: light-dark(#166534, #16a34a);
+  --color-success-900: light-dark(#14532d, #f0fdf4);
+  --color-success-contrast: light-dark(black, white);
+
+  /* =============================
+     Warning (Amber)
+     ============================= */
+  --color-warning-50: light-dark(#fffbeb, #451a03);
+  --color-warning-100: light-dark(#fef3c7, #78350f);
+  --color-warning-200: light-dark(#fde68a, #92400e);
+  --color-warning-300: light-dark(#fcd34d, #b45309);
+  --color-warning-400: light-dark(#fbbf24, #d97706);
+  --color-warning-500: light-dark(#f59e0b, #fbbf24);
+  --color-warning-600: light-dark(#d97706, #78350f);
+  --color-warning-700: light-dark(#b45309, #92400e);
+  --color-warning-800: light-dark(#92400e, #b45309);
+  --color-warning-900: light-dark(#78350f, #fffbeb);
+  --color-warning-contrast: light-dark(black, white);
+
+  /* =============================
+     Danger (Red)
+     ============================= */
+  --color-danger-50: light-dark(#fef2f2, #450a0a);
+  --color-danger-100: light-dark(#fee2e2, #7f1d1d);
+  --color-danger-200: light-dark(#fecaca, #991b1b);
+  --color-danger-300: light-dark(#fca5a5, #b91c1c);
+  --color-danger-400: light-dark(#f87171, #dc2626);
+  --color-danger-500: light-dark(#ef4444, #f87171);
+  --color-danger-600: light-dark(#dc2626, #7f1d1d);
+  --color-danger-700: light-dark(#b91c1c, #991b1b);
+  --color-danger-800: light-dark(#991b1b, #b91c1c);
+  --color-danger-900: light-dark(#7f1d1d, #fef2f2);
+  --color-danger-contrast: light-dark(black, white);
+
+  /* =============================
+     Neutral (Gray)
+     ============================= */
+  --color-neutral-50: light-dark(#fafafa, #0a0a0a);
+  --color-neutral-100: light-dark(#f4f4f5, #18181b);
+  --color-neutral-200: light-dark(#e4e4e7, #27272a);
+  --color-neutral-300: light-dark(#d4d4d8, #3f3f46);
+  --color-neutral-400: light-dark(#a1a1aa, #52525b);
+  --color-neutral-500: light-dark(#71717a, #a1a1aa);
+  --color-neutral-600: light-dark(#52525b, #d4d4d8);
+  --color-neutral-700: light-dark(#3f3f46, #e4e4e7);
+  --color-neutral-800: light-dark(#27272a, #f4f4f5);
+  --color-neutral-900: light-dark(#18181b, #fafafa);
+  --color-neutral-contrast: light-dark(black, white);
+
+  /* =====================================================
+     PRIMARY
+     -----------------------------------------------------
+     ・UI の基準色
+     ===================================================== */
+  /* semantic (UI use) */
+  --color-primary: var(--color-primary-600);
+  --color-primary-hover: var(--color-primary-700);
+  --color-primary-active: var(--color-primary-800);
+
+  /* =====================================================
+     SUCCESS
+     -----------------------------------------------------
+     ・状態・結果を示す意味色
+     ===================================================== */
+  --color-success: var(--color-success-600);
+  --color-success-hover: var(--color-success-700);
+  --color-success-active: var(--color-success-800);
+  /* =====================================================
+     WARNING
+     -----------------------------------------------------
+     ・注意喚起用
+     ===================================================== */
+  --color-warning: var(--color-warning-600);
+  --color-warning-hover: var(--color-warning-600);
+  --color-warning-active: var(--color-warning-800);
+
+  /* =====================================================
+     DANGER
+     -----------------------------------------------------
+     ・破壊的操作 / エラー
+     ===================================================== */
+  --color-danger: var(--color-danger-600);
+  --color-danger-hover: var(--color-danger-700);
+  --color-danger-active: var(--color-danger-800);
+}

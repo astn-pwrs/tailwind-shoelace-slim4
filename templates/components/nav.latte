@@ -1,0 +1,51 @@
+{* <header class="shrink-0 bg-{$theme}">
+  <nav class="relative w-screen h-14">
+    <!-- 画面基準で中央 -->
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-medium">
+      EPub Viewer
+    </div>
+
+    <!-- 中身レイアウト -->
+    <div class="mx-auto px-3 flex items-center">
+      <!-- 左 -->
+      <div class="flex items-center">
+        {block navbar-left}{/block}
+      </div>
+
+      <!-- 右 -->
+      <div class="ml-auto flex items-center gap-2 whitespace-nowrap">
+        <sl-button
+          id="theme-toggle"
+          variant="success"
+          size="large"
+          circle
+        >
+          🌙
+        </sl-button>
+      </div>
+    </div>
+  </nav>
+</header> *}
+<header class="shrink-0">
+  <nav class="w-full flex flex-row items-center bg-{$theme}  justify-between px-4">
+    <div>
+    </div>
+  <div class="text-xl font-semibold tracking-tight leading-none">
+    EPub Viewer
+  </div>
+  <div >
+        <sl-button
+          id="theme-toggle"
+          variant="success"
+          size="medium"
+          circle
+          class=" text-black"
+         
+        >
+        🌙
+        </sl-button>
+  </div>
+</nav>
+
+
+      </header>

@@ -1,0 +1,24 @@
+@theme {
+  /* radius */
+  --radius-sm: var(--sl-border-radius-small);
+  --radius-default: var(--sl-border-radius-medium);
+  --radius-lg: var(--sl-border-radius-large);
+  --radius-2xl: var(--sl-border-radius-x-large);
+  --radius-full: var(--sl-border-radius-pill);
+  --radius-circle: var(--sl-border-radius-circle);
+
+  /* shadow */
+  --shadow-sm: var(--sl-shadow-x-small);
+  --shadow-default: var(--sl-shadow-small);
+  --shadow-md: var(--sl-shadow-medium);
+  --shadow-lg: var(--sl-shadow-large);
+  --shadow-xl: var(--sl-shadow-x-large);
+
+  /* spacing */
+  --space-xs: var(--sl-spacing-2x-small);
+  --space-sm: var(--sl-spacing-x-small);
+  --space-md: var(--sl-spacing-small);
+  --space-lg: var(--sl-spacing-medium);
+  --space-xl: var(--sl-spacing-large);
+  --space-2xl: var(--sl-spacing-x-large);
+}

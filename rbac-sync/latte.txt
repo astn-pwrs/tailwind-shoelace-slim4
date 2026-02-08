@@ -1,0 +1,10 @@
+function isGroup($name) {
+    return $redis->sIsMember("RBAC:GROUP:$name:USERS", $this->userId);
+}
+
+function hasGroupRole($group, $role) {
+    $roleId = $this->roleNameToId($role);
+    return $redis->sIsMember("RBAC:GROUP:$group:ROLES", $roleId);
+}
+
+SINTER RBAC:USER:{user_id}:ROLES  RBAC:ROUTE:{route_id}:ROLES
