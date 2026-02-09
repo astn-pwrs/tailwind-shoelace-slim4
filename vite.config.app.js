@@ -26,7 +26,8 @@ export default defineConfig({
           if (asset.name.endsWith(".css")) {
             return "css/[name].[ext]";
           }
-          if (asset.name.endsWith(".ttf")) {
+          // フォントは Vite 側では出力させない
+          if (/\.(woff2?|ttf|otf|eot)$/.test(asset.name)) {
             return "fonts/[name].[ext]";
           }
           return "assets/[name].[ext]";
@@ -40,6 +41,10 @@ export default defineConfig({
       targets: [
         {
           src: "pages",
+          dest: "",
+        },
+        {
+          src: "fonts",
           dest: "",
         },
       ],
