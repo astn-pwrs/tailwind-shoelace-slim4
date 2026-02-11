@@ -21,6 +21,6 @@ class EpubController
   {
     //$this->logger->info("Home");
     $viewData = [];
-    return $this->renderer->render($response, 'pages/epub.latte', $viewData);    
+    return $this->renderer->render($response, 'pages/image.latte', $viewData);    
   }
 }
