@@ -19,7 +19,7 @@ final class Template_2d48a31f18 extends Latte\Runtime\Template
 		extract($ʟ_args);
 		unset($ʟ_args);
 
-		echo '<html lang="ja" data-theme="light" class="sl-theme-light">
+		echo '<html lang="ja" data-theme="light" class="h-full sl-theme-light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -29,17 +29,20 @@ final class Template_2d48a31f18 extends Latte\Runtime\Template
 ';
 		$this->renderBlock('head', get_defined_vars()) /* pos 8:5 */;
 		echo '  </head>
-  <body class="h-screen overflow-hidden">
-    <div class="flex flex-col h-full">
+  <body class="h-full m-0 overflow-hidden">
+    <div class="h-full m-0 flex flex-col">
 ';
-		$this->renderBlock('nav', get_defined_vars()) /* pos 12:7 */;
-		echo '      <main class="flex-1 min-h-0 overflow-y-auto">
+		$this->renderBlock('nav', get_defined_vars()) /* pos 12:17 */;
+		echo '      <main class="w-full flex flex-1 overflow-hidden" style="border:1px solid red">
+          <div class="w-full m-0 p-0 box-content mx-auto">
 ';
-		$this->renderBlock('content', get_defined_vars()) /* pos 14:9 */;
-		echo '      </main>
+		$this->renderBlock('content', get_defined_vars()) /* pos 15:13 */;
+		echo '          </div>
+      </main>
+      <!-- Footer -->
     </div>
 ';
-		$this->renderBlock('scripts', get_defined_vars()) /* pos 17:5 */;
+		$this->renderBlock('scripts', get_defined_vars()) /* pos 23:5 */;
 		echo '  </body>
 </html>
 ';
@@ -58,13 +61,13 @@ final class Template_2d48a31f18 extends Latte\Runtime\Template
 	}
 
 
-	/** {block content} on line 14 */
+	/** {block content} on line 15 */
 	public function blockContent(array $ʟ_args): void
 	{
 	}
 
 
-	/** {block scripts} on line 17 */
+	/** {block scripts} on line 23 */
 	public function blockScripts(array $ʟ_args): void
 	{
 	}

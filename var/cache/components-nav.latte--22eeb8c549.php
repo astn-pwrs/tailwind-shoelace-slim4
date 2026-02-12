@@ -15,9 +15,9 @@ final class Template_22eeb8c549 extends Latte\Runtime\Template
 		extract($ʟ_args);
 		unset($ʟ_args);
 
-		echo '<header class="shrink-0">
+		echo '<header class="h-10 bg-success flex items-center justify-center">
   <nav class="w-full flex flex-row items-center bg-';
-		echo LR\HtmlHelpers::escapeAttr($theme) /* pos 30:52 */;
+		echo LR\HtmlHelpers::escapeAttr($theme) /* pos 2:52 */;
 		echo '  justify-between px-4">
     <div>
     </div>

@@ -9,162 +9,128 @@ use Latte\Runtime as LR;
 /** source: pages/image.latte */
 final class Template_da86d7c2f2 extends Latte\Runtime\Template
 {
+	public const Blocks = [
+		['head' => 'blockHead', 'nav' => 'blockNav', 'content' => 'blockContent'],
+	];
+
 
 	public function main(array $ʟ_args): void
 	{
 		extract($ʟ_args);
 		unset($ʟ_args);
 
-		echo '<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<title>Tech Book Editor</title>
-
-<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-html, body { height:100%; }
-textarea { tab-size:2; }
-.resize-handle{
-  width:14px;height:14px;
-  background:#2563eb;
-  position:absolute;
-  right:0;bottom:0;
-  cursor:pointer;
-}
-</style>
-</head>
-
-<body class="h-full bg-gray-100 flex flex-col">
-
-<!-- ================= TOOLBAR ================= -->
-<div class="p-3 bg-white shadow flex gap-2 items-center">
-
-  <button id="prevSection" class="px-3 py-1 bg-gray-200 rounded">&lt;</button>
-  <button id="nextSection" class="px-3 py-1 bg-gray-200 rounded">&gt;</button>
-
-  <button id="addSection" class="px-3 py-1 bg-green-500 text-white rounded">
-    ＋ Section
-  </button>
-
-  <button id="addRight" class="px-3 py-1 bg-gray-200 rounded">
-    右寄せ図
-  </button>
-
-  <button id="addLeft" class="px-3 py-1 bg-gray-200 rounded">
-    左寄せ図
-  </button>
-
-  <button id="togglePreview" class="px-4 py-1 bg-blue-600 text-white rounded">
-    Section Preview
-  </button>
-
-  <button id="exportEpub" class="px-4 py-1 bg-purple-600 text-white rounded">
-    Export EPUB3
-  </button>
-
-  <span class="ml-auto text-sm text-gray-500">
-    初期＝表紙
-  </span>
-</div>
-
-<!-- ================= MAIN ================= -->
-<div class="flex-1 overflow-hidden">
-
-  <textarea id="editor"
-    class="w-full h-full p-6 font-mono text-sm outline-none resize-none bg-white"></textarea>
-
-  <div id="preview"
-    class="hidden h-full overflow-auto p-10 bg-white prose max-w-none">
-  </div>
-
-</div>
-
-<script>
+		$this->renderBlock('head', get_defined_vars()) /* pos 2:1 */;
+		$this->renderBlock('nav', get_defined_vars()) /* pos 15:1 */;
+		$this->renderBlock('content', get_defined_vars()) /* pos 18:1 */;
+		echo '<script>
 
 /* ================= Markdown ================= */
 
-const md = window.markdownit({ html:true });
+const md = window.markdownit({html:true,linkify:true});
+
+/* META BLOCK（renderしない） */
+let metaData={};
+
+md.block.ruler.before("fence","meta_block",
+function(state,startLine,endLine,silent){
+
+let pos=state.bMarks[startLine]+state.tShift[startLine];
+let max=state.eMarks[startLine];
+let line=state.src.slice(pos,max).trim();
+
+if(line!=="::: meta start") return false;
+if(silent) return true;
+
+let next=startLine+1;
+let content="";
+
+while(next<endLine){
+let p=state.bMarks[next]+state.tShift[next];
+let m=state.eMarks[next];
+let txt=state.src.slice(p,m).trim();
+if(txt==="::: meta end") break;
+content+=txt+"\\n";
+next++;
+}
+
+metaData={};
+content.split("\\n").forEach(l=>{
+const m=l.match(/^(.+?):\\s*(.+)$/);
+if(m) metaData[m[1].trim()]=m[2].trim();
+});
+
+state.line=next+1;
+return true;
+});
+
+/* Custom Block */
 
 function registerBlock(name){
 
-  md.block.ruler.before("fence","custom_"+name,
-    function(state,startLine,endLine,silent){
+md.block.ruler.before("fence","custom_"+name,
+function(state,startLine,endLine,silent){
 
-      let pos=state.bMarks[startLine]+state.tShift[startLine];
-      let max=state.eMarks[startLine];
-      let line=state.src.slice(pos,max).trim();
+let pos=state.bMarks[startLine]+state.tShift[startLine];
+let max=state.eMarks[startLine];
+let line=state.src.slice(pos,max).trim();
 
-      const match=line.match(/^::: (.+) start(.*)$/);
-      if(!match) return false;
-      if(match[1]!==name) return false;
-      if(silent) return true;
+if(!line.startsWith(`::: ${name} start`)) return false;
+if(silent) return true;
 
-      const attr=match[2]||"";
-      const sizeMatch=attr.match(/size="(sm|md|lg)"/);
-      const size=sizeMatch?sizeMatch[1]:"md";
+let attr=line.replace(`::: ${name} start`,"").trim();
+let sizeMatch=attr.match(/size="(sm|md|lg)"/);
+let size=sizeMatch?sizeMatch[1]:"md";
 
-      let next=startLine+1;
-      while(next<endLine){
-        let p=state.bMarks[next]+state.tShift[next];
-        let m=state.eMarks[next];
-        let txt=state.src.slice(p,m).trim();
-        if(txt===`::: ${name} end`) break;
-        next++;
-      }
+let next=startLine+1;
+while(next<endLine){
+let p=state.bMarks[next]+state.tShift[next];
+let m=state.eMarks[next];
+let txt=state.src.slice(p,m).trim();
+if(txt===`::: ${name} end`) break;
+next++;
+}
 
-      const open=state.push(name+"_open","",1);
-      open.meta={size};
-      state.md.block.tokenize(state,startLine+1,next);
-      state.push(name+"_close","",-1);
-      state.line=next+1;
-      return true;
-    });
+let tokenOpen=state.push(name+"_open","",1);
+tokenOpen.meta={size};
+state.md.block.tokenize(state,startLine+1,next);
+state.push(name+"_close","",-1);
+state.line=next+1;
+return true;
+});
 
-  md.renderer.rules[name+"_open"]=(tokens,idx)=>{
+md.renderer.rules[name+"_open"]=(tokens,idx)=>{
 
-    if(name==="cover"){
-      return `<section class="hero text-center py-32 bg-gradient-to-r from-indigo-600 to-blue-500 text-white">
-        <div class="max-w-3xl mx-auto">`;
-    }
+if(name==="cover")
+return `<section class="text-center mt-[25vh] bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-20 rounded-xl">`;
 
-    if(name==="section"){
-      return `<section class="my-16 clear-both">`;
-    }
+if(name==="section")
+return `<section class="my-16 clear-both">`;
 
-    if(name==="fig-right"||name==="fig-left"){
+if(name==="container")
+return `<div class="flow-root my-6">`;
 
-      const size=tokens[idx].meta.size;
-      const widthClass={
-        sm:"w-[25%]",
-        md:"w-[35%]",
-        lg:"w-[50%]"
-      }[size];
+if(name==="fig-right"||name==="fig-left"){
+const size=tokens[idx].meta.size;
+const width={
+sm:"w-[25%]",
+md:"w-[35%]",
+lg:"w-[50%]"
+}[size];
+const float=name==="fig-right"?"float-right ml-6":"float-left mr-6";
+return `<figure class="${float} ${width} mb-4 relative group">
+<div class="resize-handle"></div>`;
+}
 
-      const floatClass=name==="fig-right"
-        ? "float-right ml-6"
-        : "float-left mr-6";
+return `<div>`;
+};
 
-      return `<figure class="${floatClass} ${widthClass} mb-4 relative group">
-        <div class="resize-handle"></div>`;
-    }
+md.renderer.rules[name+"_close"]=()=>{
+if(name==="cover"||name==="section") return `</section>`;
+if(name==="container") return `</div>`;
+if(name==="fig-right"||name==="fig-left") return `</figure>`;
+return `</div>`;
+};
 
-    if(name==="container")
-      return `<div class="flow-root my-6">`;
-
-    return `<div>`;
-  };
-
-  md.renderer.rules[name+"_close"]=()=>{
-    if(name==="cover") return `</div></section>`;
-    if(name==="section") return `</section>`;
-    if(name==="fig-right"||name==="fig-left") return `</figure>`;
-    if(name==="container") return `</div>`;
-    return `</div>`;
-  };
 }
 
 registerBlock("cover");
@@ -173,97 +139,105 @@ registerBlock("container");
 registerBlock("fig-right");
 registerBlock("fig-left");
 
-/* ================= Section Data ================= */
+/* Hero h1/h2 style */
+
+const defaultH1=md.renderer.rules.heading_open||((t,i)=>"<h1>");
+const defaultH2=md.renderer.rules.heading_open||((t,i)=>"<h2>");
+
+md.renderer.rules.heading_open=(tokens,idx)=>{
+const tag=tokens[idx].tag;
+if(tag==="h1")
+return `<h1 class="text-5xl font-extrabold tracking-tight drop-shadow-lg mb-6">`;
+if(tag==="h2")
+return `<h2 class="text-2xl font-light opacity-90 mb-4">`;
+return `<${tag}>`;
+};
+
+/* ================= Section ================= */
 
 let sections=[];
 let currentIndex=0;
+let isPreview=false;
 
-function saveCurrent(){
-  sections[currentIndex]=editor.value;
-}
+function saveCurrent(){sections[currentIndex]=editor.value;}
+function loadSection(){editor.value=sections[currentIndex]||"";}
 
-function loadSection(){
-  editor.value=sections[currentIndex]||"";
-}
+function rebuildAll(){return sections.join("\\n\\n");}
 
 /* ================= Resize ================= */
 
 function enableResize(){
-  document.querySelectorAll("figure").forEach(fig=>{
-    const handle=fig.querySelector(".resize-handle");
-    if(!handle) return;
 
-    handle.onclick=()=>{
+document.querySelectorAll("figure").forEach(fig=>{
+const handle=fig.querySelector(".resize-handle");
+if(!handle) return;
 
-      const sizes=["sm","md","lg"];
-      const current=fig.className.includes("w-[25%]")?"sm":
-                    fig.className.includes("w-[50%]")?"lg":"md";
+handle.onclick=()=>{
+const sizes=["sm","md","lg"];
+const current=
+fig.className.includes("w-[25%]")?"sm":
+fig.className.includes("w-[50%]")?"lg":"md";
 
-      const next=sizes[(sizes.indexOf(current)+1)%3];
+const next=sizes[(sizes.indexOf(current)+1)%3];
 
-      editor.value=editor.value.replace(
-        /size="(sm|md|lg)"/,
-        `size="${next}"`
-      );
+editor.value=editor.value.replace(
+/size="(sm|md|lg)"/,
+`size="${next}"`
+);
 
-      preview.innerHTML=md.render(editor.value);
-      enableResize();
-    };
-  });
+preview.innerHTML=md.render(editor.value);
+enableResize();
+};
+});
 }
 
-/* ================= Buttons ================= */
+/* ================= UI ================= */
 
 const editor=document.getElementById("editor");
 const preview=document.getElementById("preview");
 
 document.getElementById("togglePreview").onclick=()=>{
-  saveCurrent();
-
-  if(preview.classList.contains("hidden")){
-    preview.innerHTML=md.render(editor.value);
-    editor.classList.add("hidden");
-    preview.classList.remove("hidden");
-    enableResize();
-  }else{
-    preview.classList.add("hidden");
-    editor.classList.remove("hidden");
-  }
+if(!isPreview){
+saveCurrent();
+preview.innerHTML=md.render(editor.value);
+editor.classList.add("hidden");
+preview.classList.remove("hidden");
+enableResize();
+}else{
+preview.classList.add("hidden");
+editor.classList.remove("hidden");
+}
+isPreview=!isPreview;
 };
 
 document.getElementById("prevSection").onclick=()=>{
-  if(currentIndex>0){
-    saveCurrent();
-    currentIndex--;
-    loadSection();
-  }
+if(currentIndex>0){
+saveCurrent();currentIndex--;loadSection();
+}
 };
 
 document.getElementById("nextSection").onclick=()=>{
-  if(currentIndex<sections.length-1){
-    saveCurrent();
-    currentIndex++;
-    loadSection();
-  }
+if(currentIndex<sections.length-1){
+saveCurrent();currentIndex++;loadSection();
+}
 };
 
 document.getElementById("addSection").onclick=()=>{
-  saveCurrent();
-  sections.push(
+saveCurrent();
+sections.push(
 `::: section start
 # 見出し${sections.length}
-
 本文
-
 ::: section end`
-  );
-  currentIndex=sections.length-1;
-  loadSection();
+);
+currentIndex=sections.length-1;
+loadSection();
 };
 
 function insertFigure(type){
-  editor.value=editor.value.replace(
-    "::: section end",
+  console.log(\'enter\')
+editor.value=editor.value.replace(
+"::: section end",
 `::: container start
 
 ::: ${type} start size="md"
@@ -273,108 +247,104 @@ function insertFigure(type){
 ::: container end
 
 ::: section end`
-  );
+);
 }
 
 document.getElementById("addRight").onclick=()=>insertFigure("fig-right");
 document.getElementById("addLeft").onclick=()=>insertFigure("fig-left");
 
-/* ================= EPUB Export ================= */
+/* ================= EPUB3 Export ================= */
 
 document.getElementById("exportEpub").onclick=async()=>{
 
-  saveCurrent();
+saveCurrent();
+const zip=new JSZip();
+zip.file("mimetype","application/epub+zip",{compression:"STORE"});
 
-  const zip=new JSZip();
-
-  zip.file("mimetype","application/epub+zip",{compression:"STORE"});
-
-  zip.folder("META-INF")
-     .file("container.xml",
+zip.folder("META-INF")
+.file("container.xml",
 `<?xml version="1.0"?>
 <container version="1.0"
- xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
- <rootfiles>
-  <rootfile full-path="OEBPS/content.opf"
-   media-type="application/oebps-package+xml"/>
- </rootfiles>
+xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+<rootfiles>
+<rootfile full-path="OEBPS/content.opf"
+media-type="application/oebps-package+xml"/>
+</rootfiles>
 </container>`);
 
-  const OEBPS=zip.folder("OEBPS");
+const OEBPS=zip.folder("OEBPS");
+const contentHtml=md.render(rebuildAll());
 
-  const html=md.render(sections.join("\\n\\n"));
-
-  OEBPS.file("content.xhtml",
+OEBPS.file("content.xhtml",
 `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Book</title>
-<link rel="stylesheet" type="text/css" href="book.css"/>
+<title>${metaData.title||"Untitled"}</title>
+<link rel="stylesheet" href="book.css"/>
 </head>
 <body>
-${html}
+${contentHtml}
 </body>
 </html>`);
 
-  OEBPS.file("book.css",
-`body{font-family:serif;line-height:1.6;}
+OEBPS.file("book.css",
+`body{font-family:serif;line-height:1.8;}
 figure{margin:1em 0;}
-`);
+img{max-width:100%;}`);
 
-  OEBPS.file("nav.xhtml",
-`<?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml"
- xmlns:epub="http://www.idpf.org/2007/ops">
-<head><title>TOC</title></head>
-<body>
-<nav epub:type="toc">
-<ol>
-<li><a href="content.xhtml">本文</a></li>
-</ol>
-</nav>
-</body>
-</html>`);
+const title=metaData.title||"Untitled";
+const creator=metaData.creator||"Unknown";
+const language=metaData.language||"ja";
+const identifier=metaData.identifier||"bookid";
 
-  OEBPS.file("content.opf",
+OEBPS.file("content.opf",
 `<?xml version="1.0" encoding="UTF-8"?>
 <package version="3.0"
- xmlns="http://www.idpf.org/2007/opf"
- unique-identifier="bookid">
+xmlns="http://www.idpf.org/2007/opf"
+unique-identifier="bookid">
 <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-<dc:identifier id="bookid">bookid</dc:identifier>
-<dc:title>Book</dc:title>
-<dc:language>ja</dc:language>
+<dc:identifier id="bookid">${identifier}</dc:identifier>
+<dc:title>${title}</dc:title>
+<dc:language>${language}</dc:language>
+<dc:creator>${creator}</dc:creator>
 </metadata>
 <manifest>
 <item id="content" href="content.xhtml"
- media-type="application/xhtml+xml"/>
-<item id="nav" href="nav.xhtml"
- media-type="application/xhtml+xml"
- properties="nav"/>
+media-type="application/xhtml+xml"/>
 <item id="css" href="book.css"
- media-type="text/css"/>
+media-type="text/css"/>
 </manifest>
 <spine>
 <itemref idref="content"/>
 </spine>
 </package>`);
 
-  const blob=await zip.generateAsync({type:"blob"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="book.epub";
-  a.click();
+const blob=await zip.generateAsync({type:"blob"});
+const a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="book.epub";
+a.click();
 };
 
-/* ================= 初期：表紙 ================= */
+/* ================= 初期データ ================= */
 
-sections=[`::: section start
+sections=[
+`::: meta start
+title: 技術書タイトル
+creator: 著者名
+language: ja
+identifier: book-id-001
+publisher: MyPublisher
+rights: © 2026 著者名
+::: meta end
+
+::: section start
 
 ::: cover start
 # タイトル
 ## サブタイトル
 
-著者: 名前  
+著者: 著者名
 2026
 ::: cover end
 
@@ -384,9 +354,77 @@ sections=[`::: section start
 loadSection();
 
 </script>
+';
+	}
 
-</body>
-</html>
+
+	public function prepare(): array
+	{
+		extract($this->params);
+
+		$this->parentName = '../layouts/base.latte';
+		return get_defined_vars();
+	}
+
+
+	/** {block head} on line 2 */
+	public function blockHead(array $ʟ_args): void
+	{
+		echo '  <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
+  <style>
+    textarea { tab-size:2; }
+    .resize-handle {
+      width:14px;height:14px;
+      background:#3b82f6;
+      position:absolute;right:0;bottom:0;
+      cursor:pointer;
+    }
+  </style>
+';
+	}
+
+
+	/** {block nav} on line 15 */
+	public function blockNav(array $ʟ_args): void
+	{
+		extract($this->params);
+		extract($ʟ_args);
+		unset($ʟ_args);
+
+		$this->createTemplate('../components/nav.latte', ['theme' => 'success'] + $this->params, 'include')->renderToContentType('html') /* pos 16:3 */;
+	}
+
+
+	/** {block content} on line 18 */
+	public function blockContent(array $ʟ_args): void
+	{
+		echo '<!-- TOOLBAR -->
+
+<!-- MAIN -->
+<div class="h-full rounded shadow flex flex-col">
+<div class="shadow flex gap-2 items-center">
+
+  <sl-button id="prevSection">&lt;</sl-button>
+  <sl-button id="nextSection">&gt;</sl-button>
+  <sl-button id="addSection">＋ Section</sl-button>
+  <sl-button id="addRight">右寄せ図</sl-button>
+  <sl-button id="addLeft">左寄せ図</sl-button>
+  <sl-button id="togglePreview">Section Preview</sl-button>
+
+<button id="exportEpub"
+class="px-4 py-1 bg-purple-600 rounded">
+Export EPUB3
+</button>
+
+</div>
+<textarea id="editor"
+class="w-full flex flex-1 p-3 font-mono text-sm outline-none resize-none" style="border:1px solid blue"></textarea>
+
+<div id="preview"
+class="hidden h-full overflow-auto p-10 prose max-w-none"></div>
+
+</div>
 ';
 	}
 }

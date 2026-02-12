@@ -1,63 +1,48 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<title>Tech Book Editor</title>
-
-<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-html, body { height:100%; }
-textarea { tab-size:2; }
-.resize-handle{
-  width:14px;height:14px;
-  background:#3b82f6;
-  position:absolute;right:0;bottom:0;
-  cursor:pointer;
-}
-</style>
-</head>
-
-<body class="h-full bg-gray-100 flex flex-col">
-
+{layout '../layouts/base.latte'}
+{block head}
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
+  <style>
+    textarea { tab-size:2; }
+    .resize-handle {
+      width:14px;height:14px;
+      background:#3b82f6;
+      position:absolute;right:0;bottom:0;
+      cursor:pointer;
+    }
+  </style>
+{/block}
+{block nav}
+  {include '../components/nav.latte',theme => 'success'}
+{/block}
+{block content}
 <!-- TOOLBAR -->
-<div class="p-3 bg-white shadow flex gap-2 items-center">
 
-<button id="prevSection" class="px-3 py-1 bg-gray-200 rounded">&lt;</button>
-<button id="nextSection" class="px-3 py-1 bg-gray-200 rounded">&gt;</button>
+<!-- MAIN -->
+<div class="h-full rounded shadow flex flex-col">
+<div class="shadow flex gap-2 items-center">
 
-<button id="addSection" class="px-3 py-1 bg-green-500 text-white rounded">
-＋ Section
-</button>
-
-<button id="addRight" class="px-3 py-1 bg-gray-200 rounded">右寄せ図</button>
-<button id="addLeft" class="px-3 py-1 bg-gray-200 rounded">左寄せ図</button>
-
-<button id="togglePreview"
-class="px-4 py-1 bg-blue-600 text-white rounded">
-Section Preview
-</button>
+  <sl-button id="prevSection">&lt;</sl-button>
+  <sl-button id="nextSection">&gt;</sl-button>
+  <sl-button id="addSection">＋ Section</sl-button>
+  <sl-button id="addRight">右寄せ図</sl-button>
+  <sl-button id="addLeft">左寄せ図</sl-button>
+  <sl-button id="togglePreview">Section Preview</sl-button>
 
 <button id="exportEpub"
-class="px-4 py-1 bg-purple-600 text-white rounded">
+class="px-4 py-1 bg-purple-600 rounded">
 Export EPUB3
 </button>
 
 </div>
-
-<!-- MAIN -->
-<div class="flex-1 overflow-hidden">
-
 <textarea id="editor"
-class="w-full h-full p-6 font-mono text-sm outline-none resize-none bg-white"></textarea>
+class="w-full flex flex-1 p-3 font-mono text-sm outline-none resize-none" style="border:1px solid blue"></textarea>
 
 <div id="preview"
-class="hidden h-full overflow-auto p-10 bg-white prose max-w-none"></div>
+class="hidden h-full overflow-auto p-10 prose max-w-none"></div>
 
 </div>
-
+{/block}
 {syntax off}
 <script>
 
@@ -272,6 +257,7 @@ loadSection();
 };
 
 function insertFigure(type){
+  console.log('enter')
 editor.value=editor.value.replace(
 "::: section end",
 `::: container start
@@ -391,6 +377,3 @@ loadSection();
 
 </script>
 {/syntax}
-
-</body>
-</html>

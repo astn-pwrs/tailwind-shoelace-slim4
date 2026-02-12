@@ -1,4 +1,4 @@
-<html lang="ja" data-theme="light" class="sl-theme-light">
+<html lang="ja" data-theme="light" class="h-full sl-theme-light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,12 +7,18 @@
     <script src="/js/main.js"></script>
     {block head}{/block}
   </head>
-  <body class="h-screen overflow-hidden">
-    <div class="flex flex-col h-full">
-      {block nav}{/block}
-      <main class="flex-1 min-h-0 overflow-y-auto">
-        {block content}{/block}
+  <body class="h-full m-0 overflow-hidden">
+    <div class="h-full m-0 flex flex-col">
+                {block nav}{/block}
+      <main class="w-full flex flex-1 overflow-hidden" style="border:1px solid red">
+          <div class="w-full m-0 p-0 box-content mx-auto">
+            {block content}{/block}
+          </div>
       </main>
+      <!-- Footer -->
+      {* <footer class="h-12 bg-gray-800 text-white flex items-center justify-center">
+        フッター
+      </footer> *}
     </div>
     {block scripts}{/block}
   </body>
