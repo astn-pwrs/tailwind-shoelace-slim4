@@ -26,6 +26,8 @@
     "@tailwindcss/vite": "^4.1.18",
     "@xmldom/xmldom": "^0.8.11",
     "epubjs": "^0.3.93",
+    "jszip": "^3.10.1",
+    "markdown-it": "^14.1.1",
     "tailwindcss": "^4.1.18"
   }
 }

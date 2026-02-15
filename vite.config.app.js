@@ -1,48 +1,83 @@
 import { defineConfig } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import tailwindcss from "@tailwindcss/vite";
-
 import path from "path";
+import fs from "fs";
+
+const rootDir = path.resolve(__dirname, "resources");
+const pagesDir = path.resolve(rootDir, "pages");
+
+//  resources/pages/*/js/index.jsを自動検出
+function getPageEntries() {
+  const entries = {};
+
+  const folders = fs.readdirSync(pagesDir, {
+    withFileTypes: true,
+  });
+
+  folders.forEach((dir) => {
+    if (!dir.isDirectory()) return;
+
+    const entry = path.resolve(pagesDir, dir.name, "js/index.js");
+
+    if (fs.existsSync(entry)) {
+      entries[dir.name] = entry;
+    }
+  });
+
+  return entries;
+}
 
 export default defineConfig({
-  root: "resources",
+  root: rootDir,
   base: "/",
+
   server: {
     watch: {
       usePolling: true,
     },
   },
+
   build: {
     outDir: path.resolve(__dirname, "public"),
     emptyOutDir: false,
+
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, "resources/js/main.js"),
+        main: path.resolve(rootDir, "js/main.js"),
+        ...getPageEntries(),
       },
+
       output: {
-        entryFileNames: "js/[name].js",
-        chunkFileNames: "js/[name].js",
+        entryFileNames: "pages/js/[name].js",
+        chunkFileNames: "pages/js/[name].js",
+
         assetFileNames: (asset) => {
-          if (asset.name.endsWith(".css")) {
-            return "css/[name].[ext]";
+          if (asset.name?.endsWith(".css")) {
+            return "pages/css/[name].[ext]";
           }
-          // フォントは Vite 側では出力させない
-          if (/\.(woff2?|ttf|otf|eot)$/.test(asset.name)) {
+
+          if (/\.(woff2?|ttf|otf|eot)$/.test(asset.name || "")) {
             return "fonts/[name].[ext]";
           }
-          return "assets/[name].[ext]";
+
+          return "pages/assets/[name].[ext]";
         },
+
+        /*
+          共通chunkを作らない
+          → ページ単体JSになる
+        */
+        manualChunks: undefined,
       },
     },
   },
+
   plugins: [
     tailwindcss(),
+
     viteStaticCopy({
       targets: [
-        {
-          src: "pages",
-          dest: "",
-        },
         {
           src: "fonts",
           dest: "",

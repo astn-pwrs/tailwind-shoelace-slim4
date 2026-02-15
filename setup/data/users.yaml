@@ -1,0 +1,18 @@
+users:
+  - user_id: "user001"
+    password: "hashed_password_001"
+    username: "ErinMushroom"
+    email: "erin@example.com"
+    organization: "Forest Research Institute"
+    title: "Researcher"
+    title_name: "Researcher"
+    must_change_password: false
+
+  - user_id: "user002"
+    password: "hashed_password_002"
+    username: "MicaFox"
+    email: "mica@example.com"
+    organization: "Mushroom Studies Center"
+    title: "Senior Mycologist"
+    title_name: "Senior Mycologist"
+    must_change_password: true

@@ -1,6 +1,6 @@
 import ePub from "epubjs";
 
-class EpubViewer {
+export class EpubViewer {
   constructor() {
     this.target = document.documentElement;
 
