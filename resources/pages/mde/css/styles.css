@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 body {
   counter-reset: chapter; /* カウンターの初期化 */
   counter-reset: subchapter; /* カウンターの初期化 */
@@ -27,4 +29,10 @@ textarea {
   right: 0;
   bottom: 0;
   cursor: pointer;
+}
+
+.md-directive {
+  background: rgba(255, 200, 0, 0.2);
+  color: #b45309;
+  font-weight: bold;
 }

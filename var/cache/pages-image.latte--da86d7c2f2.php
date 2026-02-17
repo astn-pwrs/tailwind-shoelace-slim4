@@ -59,7 +59,7 @@ final class Template_da86d7c2f2 extends Latte\Runtime\Template
 	public function blockContent(array $ʟ_args): void
 	{
 		echo '
-<div class="h-screen rounded shadow flex flex-col">
+<div class="h-full rounded shadow flex flex-col min-h-0">
 
   <!-- TOOLBAR -->
   <div class="shadow flex gap-2 items-center p-2 shrink-0">
@@ -78,18 +78,22 @@ final class Template_da86d7c2f2 extends Latte\Runtime\Template
 
   </div>
 
-  <!-- EDITOR -->
+     <div class="flex-1 min-h-0 flex p-2">
   <textarea
     id="editor"
-    class="w-full flex-1 p-3 font-mono text-sm outline-none resize-none"
-    style="border:1px solid blue"
+    spellcheck="false"
+    rows="20"
+     class="w-full flex-1 overflow-y-auto leading-tight resize-none outline-none"
+    style="box-sizing: content-box"
   ></textarea>
-
   <!-- PREVIEW -->
   <div
     id="preview"
     class="hidden flex-1 overflow-auto p-10 max-w-none"
   ></div>
+
+</div>
+
 
 </div>
 <script type="module" src="/pages/js/mde.js"></script>

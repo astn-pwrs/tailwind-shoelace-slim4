@@ -30,19 +30,19 @@ final class Template_2d48a31f18 extends Latte\Runtime\Template
 		$this->renderBlock('head', get_defined_vars()) /* pos 8:5 */;
 		echo '  </head>
   <body class="h-full m-0 overflow-hidden">
-    <div class="h-full m-0 flex flex-col">
+  <div class="h-full flex flex-col">
 ';
-		$this->renderBlock('nav', get_defined_vars()) /* pos 12:17 */;
-		echo '      <main class="w-full flex flex-1 overflow-hidden" style="border:1px solid red">
-          <div class="w-full m-0 p-0 box-content mx-auto">
+		$this->renderBlock('nav', get_defined_vars()) /* pos 12:5 */;
+		echo '    <main class="flex-1 min-h-0 w-full flex overflow-hidden">
+      <div class="w-full flex-1 min-h-0 mx-auto">
 ';
-		$this->renderBlock('content', get_defined_vars()) /* pos 15:13 */;
-		echo '          </div>
-      </main>
+		$this->renderBlock('content', get_defined_vars()) /* pos 15:9 */;
+		echo '      </div>
+    </main>
       <!-- Footer -->
-    </div>
+  </div>
 ';
-		$this->renderBlock('scripts', get_defined_vars()) /* pos 23:5 */;
+		$this->renderBlock('scripts', get_defined_vars()) /* pos 23:3 */;
 		echo '  </body>
 </html>
 ';

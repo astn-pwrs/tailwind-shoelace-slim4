@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import fs from "fs";
 
+//
 const rootDir = path.resolve(__dirname, "resources");
 const pagesDir = path.resolve(rootDir, "pages");
 
@@ -74,7 +75,7 @@ export default defineConfig({
   },
 
   plugins: [
-    tailwindcss(),
+    tailwindcss({ debug: true }),
 
     viteStaticCopy({
       targets: [

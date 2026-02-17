@@ -156,9 +156,9 @@ export function createMarkdown() {
 
         if (type === "fig-right" || type === "fig-left") {
           const width = {
-            sm: "w-[25%]",
-            md: "w-[35%]",
-            lg: "w-[50%]",
+            sm: "size-sm w-[25%]",
+            md: "size-md w-[35%]",
+            lg: "size-lg w-[50%]",
           }[size];
 
           const float =

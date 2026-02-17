@@ -7,6 +7,19 @@ export class SectionManager {
     this.currentIndex = 0;
   }
 
+  /* =============================
+     Internal helper
+  ============================= */
+
+  notifyChange() {
+    // textareaを書き換えたことを外部に通知
+    this.editor.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  /* =============================
+     Core
+  ============================= */
+
   loadInitial() {
     this.load();
   }
@@ -17,7 +30,14 @@ export class SectionManager {
 
   load() {
     this.editor.value = this.sections[this.currentIndex] || "";
+
+    // 👇 ここが最重要
+    this.notifyChange();
   }
+
+  /* =============================
+     Navigation
+  ============================= */
 
   add() {
     this.save();
@@ -46,13 +66,20 @@ export class SectionManager {
     }
   }
 
+  /* =============================
+     API
+  ============================= */
+
   getCurrentMarkdown() {
-    this.save(); // 最新を反映
+    this.save();
     return this.sections[this.currentIndex] || "";
   }
 
   setCurrentMarkdown(text) {
     this.sections[this.currentIndex] = text;
+    console.log(this.currentIndex, text);
+    console.log(this.sections);
+    this.editor.value = text; // 直接UI更新
   }
 
   rebuildAll() {

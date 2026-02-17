@@ -15,9 +15,12 @@ export class EditorApp {
     this.editor = document.getElementById("editor");
     this.preview = document.getElementById("preview");
 
+    this.isProgrammaticChange = false;
+
+    this.setupHighlightLayer();
+
     this.md = createMarkdown();
 
-    // ✅ 初期ドキュメントをSectionManagerへ渡す
     this.sections = new SectionManager(
       this.editor,
       createInitialDocument(),
@@ -25,60 +28,26 @@ export class EditorApp {
     );
 
     this.bindUI();
+    this.enableLockedLines();
 
-    // ✅ textareaに初期テンプレを表示
-    this.sections.loadInitial();
+    this.safeProgrammaticUpdate(() => {
+      this.sections.loadInitial();
+    });
   }
 
-  bindUI() {
-    document
-      .getElementById("togglePreview")
-      .addEventListener("click", () => this.togglePreview());
+  /* =============================
+     Safe update wrapper
+  ============================= */
 
-    document
-      .getElementById("addSection")
-      .addEventListener("click", () => this.sections.add());
+  safeProgrammaticUpdate(callback) {
+    this.isProgrammaticChange = true;
 
-    document.getElementById("prevPage").addEventListener("click", () => {
-      this.sections.prev();
-      this.updatePreviewIfVisible();
-    });
+    callback();
 
-    document.getElementById("nextPage").addEventListener("click", () => {
-      this.sections.next();
-      this.updatePreviewIfVisible();
-    });
-    document
-      .getElementById("addRight")
-      .addEventListener("click", () => this.insertFigure("fig-right"));
+    this.updateHighlight();
+    this.updatePreviewIfVisible();
 
-    document
-      .getElementById("addLeft")
-      .addEventListener("click", () => this.insertFigure("fig-left"));
-
-    document
-      .getElementById("exportEpub")
-      .addEventListener("click", () => exportEpub(this.md, this.sections));
-  }
-
-  togglePreview() {
-    const showing = !this.preview.classList.contains("hidden");
-
-    if (showing) {
-      this.preview.classList.add("hidden");
-      this.editor.classList.remove("hidden");
-    } else {
-      renderPreview(
-        this.preview,
-        this.md,
-        this.sections,
-        this.editor,
-        enableResize,
-      );
-
-      this.editor.classList.add("hidden");
-      this.preview.classList.remove("hidden");
-    }
+    this.isProgrammaticChange = false;
   }
 
   updatePreviewIfVisible() {
@@ -93,35 +62,261 @@ export class EditorApp {
     }
   }
 
-  getMeta() {
-    return this.md.metaData;
+  /* =============================
+     Highlight Layer (NO BLUR VERSION)
+  ============================= */
+
+  setupHighlightLayer() {
+    const wrapper = document.createElement("div");
+
+    Object.assign(wrapper.style, {
+      position: "relative",
+      width: "100%",
+      height: "100%",
+    });
+
+    const highlight = document.createElement("pre");
+    highlight.id = "editorHighlight";
+
+    const style = getComputedStyle(this.editor);
+
+    Object.assign(highlight.style, {
+      position: "absolute",
+      inset: "0",
+
+      margin: "0",
+      padding: style.padding,
+
+      font: style.font,
+      lineHeight: style.lineHeight,
+      letterSpacing: style.letterSpacing,
+
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-word",
+
+      overflow: "hidden",
+
+      boxSizing: "border-box",
+
+      pointerEvents: "none",
+
+      color: "#cc6600",
+
+      tabSize: style.tabSize,
+
+      zIndex: "1",
+    });
+
+    Object.assign(this.editor.style, {
+      position: "absolute",
+      inset: "0",
+
+      background: "transparent",
+
+      color: "transparent",
+      caretColor: "black",
+
+      resize: "none",
+
+      zIndex: "2",
+
+      font: style.font,
+      lineHeight: style.lineHeight,
+      letterSpacing: style.letterSpacing,
+
+      padding: style.padding,
+      boxSizing: "border-box",
+
+      tabSize: style.tabSize,
+    });
+
+    this.editor.parentNode.insertBefore(wrapper, this.editor);
+    wrapper.appendChild(highlight);
+    wrapper.appendChild(this.editor);
+
+    this.highlight = highlight;
+    this.editorWrapper = wrapper;
+
+    const syncScroll = () => {
+      highlight.scrollTop = this.editor.scrollTop;
+      highlight.scrollLeft = this.editor.scrollLeft;
+    };
+
+    this.editor.addEventListener("scroll", syncScroll);
+
+    this.editor.addEventListener("input", () => {
+      this.updateHighlight();
+      this.updatePreviewIfVisible();
+    });
+
+    requestAnimationFrame(() => this.updateHighlight());
   }
 
+  updateHighlight() {
+    const html = this.editor.value
+      .split("\n")
+      .map((line) =>
+        line.startsWith(":::")
+          ? `<span class="md-directive">${this.escapeHTML(line)}</span>`
+          : this.escapeHTML(line),
+      )
+      .join("\n");
+
+    this.highlight.innerHTML = html + "\n";
+  }
+
+  escapeHTML(str) {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  /* =============================
+     Locked ::: lines (UI ONLY)
+  ============================= */
+
+  enableLockedLines() {
+    const isLockedPosition = (pos) => {
+      const lines = this.editor.value.split("\n");
+
+      let index = 0;
+
+      for (const line of lines) {
+        const start = index;
+        const end = index + line.length;
+
+        if (pos >= start && pos <= end && line.startsWith(":::")) {
+          return true;
+        }
+
+        index = end + 1;
+      }
+
+      return false;
+    };
+
+    this.editor.addEventListener("beforeinput", (e) => {
+      if (this.isProgrammaticChange) return;
+
+      const start = this.editor.selectionStart;
+      const end = this.editor.selectionEnd;
+
+      if (isLockedPosition(start) || isLockedPosition(end)) {
+        e.preventDefault();
+      }
+    });
+
+    this.editor.addEventListener("keydown", (e) => {
+      if (this.isProgrammaticChange) return;
+
+      const pos = this.editor.selectionStart;
+
+      if (isLockedPosition(pos)) {
+        e.preventDefault();
+      }
+    });
+  }
+
+  /* =============================
+     UI Bindings
+  ============================= */
+
+  bindUI() {
+    document
+      .getElementById("togglePreview")
+      .addEventListener("click", () => this.togglePreview());
+
+    document
+      .getElementById("addSection")
+      .addEventListener("click", () =>
+        this.safeProgrammaticUpdate(() => this.sections.add()),
+      );
+
+    document
+      .getElementById("prevPage")
+      .addEventListener("click", () =>
+        this.safeProgrammaticUpdate(() => this.sections.prev()),
+      );
+
+    document
+      .getElementById("nextPage")
+      .addEventListener("click", () =>
+        this.safeProgrammaticUpdate(() => this.sections.next()),
+      );
+
+    document
+      .getElementById("addRight")
+      .addEventListener("click", () =>
+        this.safeProgrammaticUpdate(() => this.insertFigure("fig-right")),
+      );
+
+    document
+      .getElementById("addLeft")
+      .addEventListener("click", () =>
+        this.safeProgrammaticUpdate(() => this.insertFigure("fig-left")),
+      );
+
+    document
+      .getElementById("exportEpub")
+      .addEventListener("click", () => exportEpub(this.md, this.sections));
+  }
+
+  /* =============================
+     Preview
+  ============================= */
+
+  togglePreview() {
+    const editorBox = this.editor.parentNode;
+
+    const showing = !this.preview.classList.contains("hidden");
+
+    if (showing) {
+      this.preview.classList.add("hidden");
+      editorBox.classList.remove("hidden");
+
+      requestAnimationFrame(() => {
+        this.updateHighlight();
+      });
+    } else {
+      renderPreview(
+        this.preview,
+        this.md,
+        this.sections,
+        this.editor,
+        enableResize,
+      );
+
+      editorBox.classList.add("hidden");
+      this.preview.classList.remove("hidden");
+    }
+  }
+
+  /* =============================
+     Insert Figure
+  ============================= */
+
   insertFigure(type) {
-    // side を "right" または "left" に変換
     const side = type === "fig-left" ? "left" : "right";
 
-    // createFigureTemplate を使ってテンプレートを生成
     const template =
       "\n" + createFigureTemplate(side, "md", "キャプション") + "\n";
 
-    // 現在のセクションを取得
     let text = this.sections.sections[this.sections.currentIndex];
 
     const marker = "::: section end";
     const pos = text.lastIndexOf(marker);
 
-    if (pos === -1) {
-      // section end が無い場合は末尾に追加
-      text += template;
-    } else {
-      // section end の直前に挿入
-      text = text.slice(0, pos) + template + "\n" + text.slice(pos);
-    }
+    text =
+      pos === -1
+        ? text + template
+        : text.slice(0, pos) + template + "\n" + text.slice(pos);
 
-    // セクションを更新して再表示
     this.sections.sections[this.sections.currentIndex] = text;
     this.sections.load();
-    this.updatePreviewIfVisible();
+  }
+
+  getMeta() {
+    return this.md.metaData;
   }
 }

@@ -1,28 +1,58 @@
 export function enableResize(preview, sections, textarea, renderPreview) {
-  preview.querySelectorAll("figure").forEach((fig, index) => {
-    fig.onclick = () => {
-      const current = getSizeFromClass(fig);
+  preview.addEventListener("click", (e) => {
+    console.log("click");
+    const fig = e.target.closest("figure");
+    if (!fig) return;
 
-      const next = current === "sm" ? "md" : current === "md" ? "lg" : "sm";
+    const figures = [...preview.querySelectorAll("figure")];
+    const index = figures.indexOf(fig);
+    if (index === -1) return;
 
-      const markdown = sections.getCurrentMarkdown();
-      const updated = updateFigureSizeInMarkdown(markdown, index + 1, next);
+    const markdown = sections.getCurrentMarkdown();
 
-      textarea.value = updated;
-      sections.setCurrentMarkdown(updated);
+    const current = getSizeFromMarkdown(markdown, index + 1);
+    //console.log("current", current);
+    //console.log(markdown);
+    const next = current === "sm" ? "md" : current === "md" ? "lg" : "sm";
+    //console.log("size", current, next);
+    const updated = updateFigureSizeInMarkdown(markdown, index + 1, next);
+    //console.log("updated");
+    textarea.value = updated;
+    //console.log(textarea.value);
 
-      renderPreview();
-    };
+    sections.setCurrentMarkdown(updated);
+    //console.log("read back");
+    //console.log(sections.rebuildAll());
+    renderPreview();
   });
 }
 
-function getSizeFromClass(fig) {
-  const cls = fig.className;
+/* =========================
+   Markdownからsizeを読む
+========================= */
 
-  if (cls.includes("w-[25%]")) return "sm";
-  if (cls.includes("w-[50%]")) return "lg";
-  return "md"; // default
+function getSizeFromMarkdown(markdown, figIndex) {
+  const lines = markdown.split("\n");
+
+  let count = 0;
+
+  for (const line of lines) {
+    if (line.startsWith("::: container start fig-")) {
+      count++;
+
+      if (count === figIndex) {
+        const match = line.match(/size="(sm|md|lg)"/);
+        return match ? match[1] : "??";
+      }
+    }
+  }
+
+  //return "md";
 }
+
+/* =========================
+   Markdownを書き換え
+========================= */
 
 function updateFigureSizeInMarkdown(markdown, figIndex, newSize) {
   const lines = markdown.split("\n");
@@ -36,7 +66,6 @@ function updateFigureSizeInMarkdown(markdown, figIndex, newSize) {
       count++;
 
       if (count === figIndex) {
-        // sizeを書き換え
         if (line.includes('size="')) {
           lines[i] = line.replace(/size="(sm|md|lg)"/, `size="${newSize}"`);
         } else {

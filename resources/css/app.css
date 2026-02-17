@@ -1,4 +1,3 @@
-@config "../../tailwind.config.js";
 /* 1. Tailwind（最初に読み込む） */
 @import "tailwindcss";
 /* 1. Tailwind → 中間トークン（色） */
