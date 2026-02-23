@@ -15,12 +15,12 @@ return [
 		$latte->setLoader(new FileLoader($settings['template']));
 		$latte->setTempDirectory($settings['template_temp']);
 		$latte->setAutoRefresh($settings['auto_refresh']);
-    //$latte->addExtension(new EssentialExtension());
 		return $latte;
 	},
   TemplateRenderer::class => function (ContainerInterface $container) {
     $engine = $container->get(Engine::class);
     $app    = $container->get(App::class);
-    return new TemplateRenderer($engine);
+		$routeParser = $app->getRouteCollector()->getRouteParser();
+    return new TemplateRenderer($engine,$routeParser);
   },
 ];

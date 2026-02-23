@@ -17,10 +17,11 @@ class EpubController
     $this->renderer = $renderer;
     $this->logger   = $logger;
   }
-  public function view(Request $request, Response $response): Response
+  public function top(Request $request, Response $response, $args): Response
   {
-    //$this->logger->info("Home");
+    $action = $args['action'] ?? 'top';
+    $this->logger->debug("action:".$action);
     $viewData = [];
-    return $this->renderer->render($response, 'pages/image.latte', $viewData);    
+    return $this->renderer->render($response, "pages/$action.latte", $viewData);    
   }
 }

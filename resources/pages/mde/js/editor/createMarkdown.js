@@ -13,7 +13,7 @@ export function createMarkdown() {
   /* ================= PLACEHOLDER IMAGE ================= */
 
   const placeholderSVG = `
-<svg xmlns="http://www.w3.org/2000/svg" width="450" height="450">
+<svg xmlns="http://www.w3.org/2000/svg" width="450" height="450" preserveAspectRatio="xMidYMid meet">
   <rect width="100%" height="100%" fill="#f3f4f6"/>
   <rect x="10" y="10" width="430" height="430"
         fill="none" stroke="#9ca3af" stroke-dasharray="10 8"/>
@@ -28,8 +28,7 @@ export function createMarkdown() {
 </svg>`;
 
   const placeholderBase64 =
-    "data:image/svg+xml;base64," +
-    btoa(unescape(encodeURIComponent(placeholderSVG)));
+    "data:image/svg+xml;utf8," + encodeURIComponent(placeholderSVG);
 
   /* ================= META BLOCK ================= */
 
@@ -146,8 +145,8 @@ export function createMarkdown() {
       if (name === "cover") {
         inCover = true;
         return `
-<div class="grid place-items-center">
-  <div class="text-center max-w-3xl px-6">
+<div class="epub-content epub-cover grid place-items-center">
+  <div class="epub-cover-center text-center max-w-3xl px-6">
 `;
       }
 
@@ -238,16 +237,16 @@ export function createMarkdown() {
     let finalSrc = src === "path/to/image.jpg" ? placeholderBase64 : src;
 
     if (!caption) {
-      return `<img src="${finalSrc}" alt="${alt}">`;
+      return `<img class="w-full h-auto block" src="${finalSrc}" alt="${alt}">`;
     }
 
     const id = ++env.figureCounter;
 
     return `
-<img src="${finalSrc}" alt="${alt}">
+<img class="w-full h-auto block" src="${finalSrc}" alt="${alt}">
 <figcaption>図${id}：${caption}</figcaption>
 </figure>
-<div class="overflow-hidden">
+<p class="text-justify">
 `;
   };
 

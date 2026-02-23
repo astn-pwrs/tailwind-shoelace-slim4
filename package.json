@@ -28,6 +28,7 @@
     "epubjs": "^0.3.93",
     "jszip": "^3.10.1",
     "markdown-it": "^14.1.1",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "uuid": "^13.0.0"
   }
 }

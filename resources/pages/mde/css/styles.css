@@ -18,21 +18,22 @@ h2.subchapter::before {
   content: counter(chapter) "-" counter(subchapter) ". ";
 }
 
-textarea {
+#editor {
   tab-size: 2;
+  caret-color: light-dark("black", "white") !important;
 }
+
 .resize-handle {
   width: 14px;
   height: 14px;
   background: #3b82f6;
   position: absolute;
   right: 0;
-  bottom: 0;
+  top: 0;
   cursor: pointer;
 }
 
 .md-directive {
   background: rgba(255, 200, 0, 0.2);
-  color: #b45309;
   font-weight: bold;
 }

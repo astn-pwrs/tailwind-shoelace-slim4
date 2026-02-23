@@ -1,15 +1,14 @@
 import JSZip from "jszip";
+import { transformHtmlForEpub } from "./transformHtmlForEpub.js";
 
-export async function exportEpub(md, sections) {
-  md.render(sections.rebuildAll());
+// layout: "fixed" または "reflow"
+export async function exportEpub(md, sections, { layout = "reflow" } = {}) {
   const zip = new JSZip();
 
-  /* ---------- mimetype ---------- */
-
+  // ---------- mimetype ----------
   zip.file("mimetype", "application/epub+zip", { compression: "STORE" });
 
-  /* ---------- container ---------- */
-
+  // ---------- container ----------
   zip.folder("META-INF").file(
     "container.xml",
     `<?xml version="1.0"?>
@@ -24,18 +23,17 @@ media-type="application/oebps-package+xml"/>
 
   const OEBPS = zip.folder("OEBPS");
 
-  /* ---------- section分割 ---------- */
-
+  // ---------- section分割 ----------
   const files = [];
   const allText = sections.rebuildAll();
-
   const blocks =
     allText.match(/::: (cover|section) start[\s\S]*?::: \1 end/g) || [];
 
   let index = 0;
 
   for (const block of blocks) {
-    const html = md.render(block);
+    const rawHtml = md.render(block);
+    const transformedHtml = transformHtmlForEpub(rawHtml, layout); // layoutを渡す！
 
     const name = block.includes("cover")
       ? "title.xhtml"
@@ -46,24 +44,12 @@ media-type="application/oebps-package+xml"/>
       `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>${md.metaData.title || "Untitled"}</title>
-<style>      
-  html,body {
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
-    background-color: #f5f5f5;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-</style>
-<link rel="stylesheet" href="book.css"/>
+  <title>${md.metaData.title || "Untitled"}</title>
+  <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="book.css"/>
 </head>
 <body>
-${html}
+${transformedHtml}
 </body>
 </html>`,
     );
@@ -71,68 +57,190 @@ ${html}
     files.push(name);
   }
 
-  /* ---------- CSS ---------- */
+  // ---------- CSS ----------
+  const cssFixed = `
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 768px;
+  height: 1024px;
+  position: relative;
+  font-family: serif;
+  overflow: hidden;
+}
 
-  OEBPS.file(
-    "book.css",
-    `.section {
-        width: 100%;
-        height: 100%;
-        clear: both;
-      }
-      .content {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        background-color: #e0e6e3;
-      }
+h1,h2,h3,h4,h5,h6 {
+  font-weight :bold;
+  font-size: 16px;
+}
+.epub-content {
+  position: absolute;
+}
 
-      .title-content {
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        align-items: center;
-        padding: 1em;
-      }
+.epub-cover {
+  top: 0;
+  left: 0;
+  width: 768px;
+  height: 1024px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+}
 
-      .title {
-        font-size: 2.5em;
-        margin: 0.2em 0;
-      }
+.epub-cover-center {
+  max-width: 600px;
+}
 
-      .subtitle {
-        font-size: 1.5em;
-        margin: 0.2em 0;
-        color: #555;
-      }
+.epub-cover h1 {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
 
-      .title-content p {
-        font-size: 1.2em;
-        margin-top: 1em;
-        color: #888;
-      }
-`,
-  );
+.epub-cover h2 {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
 
-  /* ---------- metadata ---------- */
+.epub-cover p {
+  font-size: 16px;
+}
 
+.epub-figure {
+  position: absolute;
+}
+
+.image-right {
+  left: 480px;
+  top: 100px;
+}
+
+.image-left {
+  left: 50px;
+  top: 100px;
+}
+
+.epub-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.epub-width-25 { width: 25%; }
+.epub-width-35 { width: 35%; }
+.epub-width-50 { width: 50%; }
+.epub-width-80 { width: 80%; }
+.epub-width-100 { width: 100%; }
+
+.image-block img {
+  width: 100%;
+  height: auto;
+}
+
+.epub-text {
+  position: absolute;
+  top: 100px;
+  left: 50px;
+  width: 400px;
+  line-height: 1.6;
+}
+`;
+
+  const cssReflow = `
+html, body {
+  margin: 1em;
+  padding: 0;
+  font-family: serif;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-weight: bold;
+  font-size: 1em;
+}
+
+.epub-content {
+  position: static;
+  margin-bottom: 2em;
+}
+
+.epub-cover {
+  text-align: center;
+  margin: 4em auto;
+}
+
+.epub-cover-center {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.epub-cover h1 {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+}
+
+.epub-cover h2 {
+  font-size: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.epub-cover p {
+  font-size: 1em;
+  color: #666;
+}
+
+.epub-figure {
+  margin: 1em 0;
+}
+
+.epub-float-right {
+  float: right;
+  margin: 0 0 1em 1em;
+  max-width: 50%;
+}
+
+.epub-float-left {
+  float: left;
+  margin: 0 1em 1em 0;
+  max-width: 50%;
+}
+
+.epub-width-25 { width: 25%; }
+.epub-width-35 { width: 35%; }
+.epub-width-50 { width: 50%; }
+.epub-width-80 { width: 80%; }
+.epub-width-100 { width: 100%; }
+
+.epub-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.image-block img {
+  width: 100%;
+  height: auto;
+}
+`;
+
+  OEBPS.file("book.css", layout === "fixed" ? cssFixed : cssReflow);
+
+  // ---------- metadata ----------
   const meta = md.metaData;
 
   const manifest = files
     .map(
       (f, i) =>
-        `<item id="item${i}"
-href="${f}"
-media-type="application/xhtml+xml"/>`,
+        `<item id="item${i}" href="${f}" media-type="application/xhtml+xml"/>`,
     )
     .join("\n");
 
   const spine = files.map((_, i) => `<itemref idref="item${i}"/>`).join("\n");
 
-  /* ---------- OPF ---------- */
-
+  // ---------- OPF ----------
   OEBPS.file(
     "content.opf",
     `<?xml version="1.0" encoding="UTF-8"?>
@@ -141,25 +249,15 @@ xmlns="http://www.idpf.org/2007/opf"
 unique-identifier="bookid">
 
 <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-<dc:identifier id="bookid">
-${meta.identifier || "bookid"}
-</dc:identifier>
-<dc:title>
-${meta.title || "Untitled"}
-</dc:title>
-<dc:language>
-${meta.language || "ja"}
-</dc:language>
-<dc:creator>
-${meta.creator || "Unknown"}
-</dc:creator>
+  <dc:identifier id="bookid">${meta.identifier || "bookid"}</dc:identifier>
+  <dc:title>${meta.title || "Untitled"}</dc:title>
+  <dc:language>${meta.language || "ja"}</dc:language>
+  <dc:creator>${meta.creator || "Unknown"}</dc:creator>
 </metadata>
 
 <manifest>
 ${manifest}
-<item id="css"
-href="book.css"
-media-type="text/css"/>
+<item id="css" href="book.css" media-type="text/css"/>
 </manifest>
 
 <spine>
@@ -169,12 +267,8 @@ ${spine}
 </package>`,
   );
 
-  /* ---------- export ---------- */
-
-  const blob = await zip.generateAsync({
-    type: "blob",
-  });
-
+  // ---------- export ----------
+  const blob = await zip.generateAsync({ type: "blob" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "book.epub";

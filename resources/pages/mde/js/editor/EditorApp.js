@@ -100,8 +100,6 @@ export class EditorApp {
 
       pointerEvents: "none",
 
-      color: "#cc6600",
-
       tabSize: style.tabSize,
 
       zIndex: "1",
@@ -114,7 +112,8 @@ export class EditorApp {
       background: "transparent",
 
       color: "transparent",
-      caretColor: "black",
+
+      caretColor: "light-dark(#000000,#ffffff)",
 
       resize: "none",
 
