@@ -1,0 +1,17 @@
+<div class="folder-contents">
+  <h3>{$currentFolderName}</h3>
+  <div class="file-grid">
+    {foreach $currentFolderItems as $item}
+      <div class="file-item">
+        <sl-icon name="
+          {if $item->status !== 'ok'}
+            {if $item->type === 'directory'}folder-x{else}file-x{/if}
+          {else}
+            {if $item->type === 'directory'}folder{else}file{/if}
+          {/if}
+        "></sl-icon>
+        <span>{$item->name|escape}</span>
+      </div>
+    {/foreach}
+  </div>
+</div>

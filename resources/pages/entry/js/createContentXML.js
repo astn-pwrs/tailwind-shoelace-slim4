@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-export function createEpubMetadataXML() {
+export function createContentXML() {
   const identifier = `urn:uuid:${uuidv4()}`;
   const container = document.getElementById("epub-meta");
   const getValue = (selector) => container.querySelector(selector)?.value || "";
