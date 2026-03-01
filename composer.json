@@ -23,6 +23,7 @@
     "latte/latte": "^3.1",
     "tracy/tracy": "^2.11",
     "bryanjhv/slim-session": "^4.1",
-    "slim/psr7": "^1.8"
+    "slim/psr7": "^1.8",
+    "ramsey/uuid": "^4.9"
   }
 }

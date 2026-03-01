@@ -15,5 +15,8 @@ return [
       'template_temp' => __DIR__ . '/../../var/cache',
       'auto_refresh'  => true
     ],
+    'io' => [
+      'basedir' => __DIR__ . '/../../storage',       
+    ]
   ]
 ];

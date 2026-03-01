@@ -17,6 +17,11 @@ class IOService
     $this->logger = $logger;
   }
 
+  public function getBaseDir(): string
+  {
+    return $this->baseDir;
+  }
+
   /**
    * 指定された相対パスにディレクトリを作成する
    */
@@ -277,6 +282,23 @@ public function getDirectoryTree(string $relativeDir = ''): array
 
     $zip->close();
     return ['zip_path' => $zipPath];
+  }
+
+  public function createAsciiFolderName(string $title): string {
+    // UTF-8 → ASCII（ローマ字変換＋記号除去）
+    $transliterated = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $title);
+
+    // 小文字にして、空白や記号をアンダースコアに
+    $safe = strtolower($transliterated);
+    $safe = preg_replace('/[^a-z0-9]+/', '_', $safe);
+    $safe = trim($safe, '_');
+
+    // ハッシュで一意性を確保（SHA-1の先頭12文字）
+    $hash = substr(sha1($title), 0, 12);
+
+    // フォルダ名を組み立て（短縮タイトル＋ハッシュ）
+    $short = substr($safe, 0, 30);
+    return $short . '_' . $hash;
   }
 
   /**

@@ -12,7 +12,7 @@
     </div>
     <!-- フォーム本体 -->
     <div class="w-full flex-1 flex items-center justify-center">
-      <div id="epub-meta" class="w-[50%]">
+      <form id="epub-meta" class="w-[50%]">
         <sl-input name="title" label="タイトル" placeholder="例：吾輩は猫である" required></sl-input>
         <sl-input name="creator" label="著者" placeholder="例：夏目漱石" required></sl-input>
         <sl-select name="language" label="言語" value="ja" required>
@@ -21,8 +21,8 @@
         </sl-select>
         <sl-input name="publisher" label="発行元" placeholder="例：青空文庫"></sl-input>
         <sl-textarea name="description" label="説明" placeholder="この本の概要を入力してください..."></sl-textarea>
-        <sl-button id="save-button" variant="primary" class="w-full">保存</sl-button>
-      </div>
+        <sl-button id="save-button" variant="primary" class="w-full">新規作成</sl-button>
+      </form>
     </div>
   </div>
 {/block}
