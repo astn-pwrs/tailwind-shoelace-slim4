@@ -5,13 +5,13 @@ namespace App\Service;
 use ZipArchive;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
-
+use Psr\Log\LoggerInterface;
 class IOService
 {
   private $baseDir;
   private $logger;
 
-  public function __construct(string $baseDir, $logger)
+  public function __construct(string $baseDir, LoggerInterface $logger)
   {
     $this->baseDir = rtrim($baseDir, DIRECTORY_SEPARATOR);
     $this->logger = $logger;
@@ -61,11 +61,38 @@ class IOService
       throw new \RuntimeException("コピー先ディレクトリを作成できません: $dstDir");
     }
     if (!copy($srcFile, $dstFile)) {
+      $this->logger->debug("src:".$srcFile);
+      $this->logger->debug("dst".$dstFile);
       throw new \RuntimeException("ファイルのコピーに失敗しました。");
     }
 
     return ['path' => $dstFile];
   }
+
+  /**
+   * ディレクトリを再帰的にコピーする
+   *
+   * @param string $src 相対パス（コピー元）
+   * @param string $dest 相対パス（コピー先）
+   * @return array コピー先のパス情報
+  */
+  public function copyDirectory(string $src, string $dest): array
+  {
+    $src = $this->normalizePath($src);
+    $dest = $this->normalizePath($dest);
+
+    $srcPath = $this->baseDir . DIRECTORY_SEPARATOR . $src;
+    $destPath = $this->baseDir . DIRECTORY_SEPARATOR . $dest;
+
+    if (!is_dir($srcPath)) {
+      throw new \RuntimeException("コピー元ディレクトリが存在しません: $srcPath");
+    }
+
+    $this->recursiveCopy($srcPath, $destPath);
+
+    return ['copied_from' => $srcPath, 'copied_to' => $destPath];
+  }
+
 
   /**
    * ファイルまたはディレクトリの名前を変更する
@@ -92,6 +119,37 @@ class IOService
     }
 
     return ['old' => $oldFullPath, 'new' => $newFullPath];
+  }
+
+  /**
+   * 実際の再帰コピー処理
+   */
+  private function recursiveCopy(string $src, string $dest): void
+  {
+    if (!is_dir($dest)) {
+      if (!mkdir($dest, 0777, true) && !is_dir($dest)) {
+        throw new \RuntimeException("コピー先ディレクトリを作成できません: $dest");
+      }
+    }
+
+    $items = scandir($src);
+    foreach ($items as $item) {
+      if ($item === '.' || $item === '..') {
+        continue;
+      }
+
+      $srcItem = $src . DIRECTORY_SEPARATOR . $item;
+      $destItem = $dest . DIRECTORY_SEPARATOR . $item;
+
+      if (is_dir($srcItem)) {
+        $this->recursiveCopy($srcItem, $destItem);
+      } else {
+        if (!copy($srcItem, $destItem)) {
+          $this->logger->error("ファイルコピー失敗: $srcItem → $destItem");
+          throw new \RuntimeException("ファイルのコピーに失敗しました: $srcItem");
+        }
+      }
+    }
   }
 
   /**

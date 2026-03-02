@@ -10,6 +10,8 @@ $containers = array_merge(
     require __DIR__ . '/containers/psr7.php',
     require __DIR__ . '/containers/renderer.php',
     require __DIR__ . '/containers/pdo.php',
+    require __DIR__ . '/containers/service.php',
+    require __DIR__ . '/containers/api.php',
     require __DIR__ . '/containers/web.php'
 );
 

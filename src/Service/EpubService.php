@@ -4,14 +4,15 @@ namespace App\Service;
 
 use Ramsey\Uuid\Uuid;
 use Exception;
-
+use Psr\Log\LoggerInterface;
 class EpubService
 {
   private IOService $io;
-
-  public function __construct(IOService $io)
+  private $logger;
+  public function __construct(IOService $io, LoggerInterface $logger)
   {
     $this->io = $io;
+    $this->logger = $logger;
   }
 
   public function createAsciiFolderName(string $title): string
@@ -23,21 +24,18 @@ class EpubService
   public function setup(array $data): string
   {
     $folderName = $this->io->createAsciiFolderName($data['title']);
-    $basePath = $folderName;
+    $dstPath = "epub" . DIRECTORY_SEPARATOR . $folderName;
 
     try {
-      $templatePath = __DIR__ . '/template';
-      if (!is_dir($templatePath)) { 
-        throw new \RuntimeException("テンプレートディレクトリが見つかりません: {$templatePath}");
-      }
+      $templatePath = '/epub/template';
       // 1. 作業フォルダ作成
-      if (!$this->io->copyFile($templatePath,$basePath)) {
-        throw new Exception("Failed to create base directory: {$basePath}");
+      if (!$this->io->copyDirectory($templatePath,$dstPath)) {
+        throw new Exception("Failed to copy template directory: {$dstPath}");
       }
 
       // 2. content.opf 書き換え
       $bookId = Uuid::uuid4()->toString();
-      $contentPath=$this->io->getBaseDir() . "/{$basePath}/OEBPS/content.opf";
+      $contentPath=$this->io->getBaseDir() . "/{$dstPath}/OBPS/content.opf";
       $content = file_get_contents($contentPath);
       if ($content === false) { 
         throw new \RuntimeException("opfファイルの読み込みに失敗しました"); 
@@ -59,6 +57,7 @@ class EpubService
 
     } catch (Exception $e) {
       // 必要に応じてログ出力などもここで
+      $this->logger->debug($e);
       throw $e; // 呼び出し元でハンドリングできるように再スロー
     }
 

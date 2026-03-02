@@ -12,7 +12,8 @@ final class EpubController
 {
   private EpubService $epub;
   private LoggerInterface $logger;
-  public function __construct($epub, $logger){
+  public function __construct(EpubService $epub, LoggerInterface $logger){
+
     $this->epub   = $epub;
     $this->logger = $logger;
   }

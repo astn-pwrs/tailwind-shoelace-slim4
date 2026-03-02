@@ -13,6 +13,7 @@
     <!-- フォーム本体 -->
     <div class="w-full flex-1 flex items-center justify-center">
       <form id="epub-meta" class="w-[50%]">
+        <input type="hidden" name="api" value="{=routeUrl('epub.setup')}" >
         <sl-input name="title" label="タイトル" placeholder="例：吾輩は猫である" required></sl-input>
         <sl-input name="creator" label="著者" placeholder="例：夏目漱石" required></sl-input>
         <sl-select name="language" label="言語" value="ja" required>

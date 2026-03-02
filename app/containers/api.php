@@ -8,8 +8,8 @@ use App\API\EpubController;
 
 return [
   EpubController::class => function (ContainerInterface $container) {
-    $service   = $container->get(EpubService::class);
+    $service  = $container->get(EpubService::class);
     $logger   = $container->get(LoggerInterface::class);
-    new EpubController($service,$logger);
+    return new EpubController($service,$logger);
   }
 ];

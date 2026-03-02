@@ -22,7 +22,7 @@ final class Template_b536af1506 extends Latte\Runtime\Template
 		$this->renderBlock('head', get_defined_vars()) /* pos 2:1 */;
 		$this->renderBlock('nav', get_defined_vars()) /* pos 4:1 */;
 		$this->renderBlock('content', get_defined_vars()) /* pos 7:1 */;
-		$this->renderBlock('scripts', get_defined_vars()) /* pos 29:1 */;
+		$this->renderBlock('scripts', get_defined_vars()) /* pos 30:1 */;
 	}
 
 
@@ -55,6 +55,10 @@ final class Template_b536af1506 extends Latte\Runtime\Template
 	/** {block content} on line 7 */
 	public function blockContent(array $ʟ_args): void
 	{
+		extract($this->params);
+		extract($ʟ_args);
+		unset($ʟ_args);
+
 		echo '  <div class="h-screen flex flex-col">
     <!-- ヘッダー -->
     <div class="p-6 text-center shadow">
@@ -63,6 +67,9 @@ final class Template_b536af1506 extends Latte\Runtime\Template
     <!-- フォーム本体 -->
     <div class="w-full flex-1 flex items-center justify-center">
       <form id="epub-meta" class="w-[50%]">
+        <input type="hidden" name="api"';
+		echo LR\HtmlHelpers::formatAttribute(' value', ($this->global->fn->routeUrl)($this, 'epub.setup')) /* pos 16:50 */;
+		echo ' >
         <sl-input name="title" label="タイトル" placeholder="例：吾輩は猫である" required></sl-input>
         <sl-input name="creator" label="著者" placeholder="例：夏目漱石" required></sl-input>
         <sl-select name="language" label="言語" value="ja" required>
@@ -79,7 +86,7 @@ final class Template_b536af1506 extends Latte\Runtime\Template
 	}
 
 
-	/** {block scripts} on line 29 */
+	/** {block scripts} on line 30 */
 	public function blockScripts(array $ʟ_args): void
 	{
 		echo '  <script type="module" src="/pages/js/entry.js"></script>

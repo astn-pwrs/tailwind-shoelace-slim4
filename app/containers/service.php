@@ -7,12 +7,13 @@ use App\Service\EpubService;
 
 return [
   IOService::class => function (ContainerInterface $container) {
-    $baseDir = $container->get('settings')['io']['basedir'];
+    $baseDir  = $container->get('settings')['io']['basedir'];
     $logger   = $container->get(LoggerInterface::class);
-    return new IOService($baseDir,$logger); 
+    return new IOService( $baseDir,$logger); 
   },
   EpubService::class => function (ContainerInterface $container) { 
     $io   = $container->get(IOService::class);
-    return new EpubService($io);
+    $logger   = $container->get(LoggerInterface::class);
+    return new EpubService($io, $logger);
   }
 ];
