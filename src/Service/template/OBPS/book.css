@@ -1,0 +1,91 @@
+html,
+body {
+  margin: 1em;
+  padding: 0;
+  font-family: serif;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+  font-size: 1em;
+}
+
+.epub-content {
+  position: static;
+  margin-bottom: 2em;
+}
+
+.epub-cover {
+  text-align: center;
+  margin: 4em auto;
+}
+
+.epub-cover-center {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.epub-cover h1 {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+}
+
+.epub-cover h2 {
+  font-size: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.epub-cover p {
+  font-size: 1em;
+  color: #666;
+}
+
+.epub-figure {
+  margin: 1em 0;
+}
+
+.epub-float-right {
+  float: right;
+  margin: 0 0 1em 1em;
+  max-width: 50%;
+}
+
+.epub-float-left {
+  float: left;
+  margin: 0 1em 1em 0;
+  max-width: 50%;
+}
+
+.epub-width-25 {
+  width: 25%;
+}
+.epub-width-35 {
+  width: 35%;
+}
+.epub-width-50 {
+  width: 50%;
+}
+.epub-width-80 {
+  width: 80%;
+}
+.epub-width-100 {
+  width: 100%;
+}
+
+.epub-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.image-block img {
+  width: 100%;
+  height: auto;
+}

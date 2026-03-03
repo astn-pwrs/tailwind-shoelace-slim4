@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+body {
+  counter-reset: chapter; /* カウンターの初期化 */
+  counter-reset: subchapter; /* カウンターの初期化 */
+}
+
+h1.chapter {
+  counter-increment: chapter; /* カウントを進める */
+  counter-reset: subchapter; /* カウンターの初期化 */
+}
+
+.chapter::before {
+  content: counter(chapter) ". ";
+}
+
+h2.subchapter::before {
+  content: counter(chapter) "-" counter(subchapter) ". ";
+}
+
+#editor {
+  tab-size: 2;
+  caret-color: light-dark("black", "white") !important;
+}
+
+.resize-handle {
+  width: 14px;
+  height: 14px;
+  background: #3b82f6;
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+}
+
+.md-directive {
+  background: rgba(255, 200, 0, 0.2);
+  font-weight: bold;
+}

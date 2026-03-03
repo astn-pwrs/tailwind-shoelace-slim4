@@ -1,0 +1,35 @@
+@config "../tailwind.config.js";
+/* 1. Tailwind（最初に読み込む） */
+@import "tailwindcss";
+/* 1. Tailwind → 中間トークン（色） */
+@import "./tailwind-tokens.css";
+/* 2. Tailwind → Shoelace（色同期） */
+@import "./shoelace-theme.css";
+
+/* 3. Shoelace 本体 */
+@import "./shoelace-font.css";
+@import "./shoelace-design-tokens.css";
+
+@import "./shoelace-components.css";
+
+/* 4. Shoelace → Tailwind（サイズ同期） */
+@import "./shoelace-to-tailwind.css";
+
+@import "./utilities.css";
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  color: var(--text-base);
+  background-color: light-dark(#e7e8e9, #292828);
+}
+
+sl-textarea::part(textarea) {
+  overflow: hidden;
+}
+
+sl-button#theme-toggle::part(label) {
+  font-size: 1.5rem;
+}

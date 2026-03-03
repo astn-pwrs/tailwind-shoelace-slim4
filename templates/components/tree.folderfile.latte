@@ -1,0 +1,28 @@
+<sl-tree class="tree-with-icons">
+  {include folderTree, node => $tree, expanded => true}
+</sl-tree>
+{define folderTree}
+  <sl-tree-item n:if="$node->type === 'directory'" n:attr="expanded => $expanded ? true : null">
+    <sl-icon name="{$node->status === 'ok' ? 'folder' : 'folder-x'}"></sl-icon>
+    {$node->name|escape}
+
+    {ifset $node->children}
+      {foreach $node->children as $child}
+        {include folderTree, node => $child, expanded => false}
+      {/foreach}
+    {/ifset}
+  </sl-tree-item>
+  <sl-tree-item n:if="$node->type === 'file'">
+    {var $ext = pathinfo($node->name, PATHINFO_EXTENSION)|lower}
+    {var $icon = match ($ext) {
+      'jpg', 'jpeg', 'png', 'gif', 'webp' => 'image',
+      'pdf' => 'file-pdf',
+      'xls', 'xlsx' => 'file-bar-graph',
+      'txt' => 'file',
+      'csv' => 'file-spreadsheet',
+      default => 'file'
+    }}
+    <sl-icon name="{$node->status === 'ok' ? $icon : 'file-x'}"></sl-icon>
+    {$node->name|escape}
+  </sl-tree-item>
+{/define}

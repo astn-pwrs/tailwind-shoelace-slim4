@@ -1,0 +1,32 @@
+{layout '../layouts/base.latte'}
+{block head}
+{/block}
+{block nav}
+  {include '../components/nav.latte',theme => 'success'}
+{/block}
+{block content}
+  <div class="h-screen flex flex-col">
+    <!-- ヘッダー -->
+    <div class="p-6 text-center shadow">
+      <h1 class="text-2xl font-bold">EPUB メタ情報入力</h1>
+    </div>
+    <!-- フォーム本体 -->
+    <div class="w-full flex-1 flex items-center justify-center">
+      <form id="epub-meta" class="w-[50%]">
+        <input type="hidden" name="api" value="{=routeUrl('epub.setup')}" >
+        <sl-input name="title" label="タイトル" placeholder="例：吾輩は猫である" required></sl-input>
+        <sl-input name="creator" label="著者" placeholder="例：夏目漱石" required></sl-input>
+        <sl-select name="language" label="言語" value="ja" required>
+          <sl-option value="ja">日本語 (ja)</sl-option>
+          <sl-option value="en">English (en)</sl-option>
+        </sl-select>
+        <sl-input name="publisher" label="発行元" placeholder="例：青空文庫"></sl-input>
+        <sl-textarea name="description" label="説明" placeholder="この本の概要を入力してください..."></sl-textarea>
+        <sl-button id="save-button" variant="primary" class="w-full">新規作成</sl-button>
+      </form>
+    </div>
+  </div>
+{/block}
+{block scripts}
+  <script type="module" src="/pages/js/entry.js"></script>
+{/block}
